@@ -1,13 +1,11 @@
 /* /frontend/App.js */
-import { Button } from "react-bootstrap";
+
+import ProductMaster from "./Pages/ProductMaster";
 
 function App() {
   return (
     <div>
-     Hello World
-     <Button variant="primary">
-      Click me
-    </Button>
+      <ProductMaster />
     </div>
   );
 }
