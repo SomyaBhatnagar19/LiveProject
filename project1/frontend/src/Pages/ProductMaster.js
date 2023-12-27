@@ -17,14 +17,12 @@ export default function ProductMaster() {
     padding: "20px",
     border: "1px solid #edefdd",
     borderRadius: "8px",
-    // maxWidth: "700px",
-    // marginTop: "2rem",
     boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.2)",
   };
 
   // Input row style
   const inputRowStyle = {
-    marginBottom: "10px", // Adjusted margin for a cleaner look
+    marginBottom: "10px", 
   };
 
   // Button container style

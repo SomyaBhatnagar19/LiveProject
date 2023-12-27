@@ -11,7 +11,6 @@ const Header = () => {
       return (
         <Navbar style={customNavbarStyle} className='mb-2'>
           <Navbar.Brand href="#">Logo</Navbar.Brand>
-         
         </Navbar>
   );
 };
