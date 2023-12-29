@@ -1,9 +1,7 @@
-/* /frontend/Pages/LoginSignUp.js */
-
 import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 
-const LoginSignUp = () => {
+const LoginSignUp = ({ onUserLogin }) => {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [signupUsername, setSignupUsername] = useState('');
@@ -11,12 +9,33 @@ const LoginSignUp = () => {
   const [reenterPassword, setReenterPassword] = useState('');
   const [showSignup, setShowSignup] = useState(false);
 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const handleLogin = (e) => {
     e.preventDefault();
-    // Perform authentication logic here, for simplicity, just log the credentials
-    console.log('Login Email:', loginEmail);
-    console.log('Login Password:', loginPassword);
+    
+    // Perform authentication logic here
+    // For simplicity, assuming successful login
+  
+    // Create an object to store user information
+    const user = {
+      email: loginEmail,
+      password: loginPassword,
+    };
+  
+    // Convert the user object to a JSON string
+    const userJSON = JSON.stringify(user);
+  
+    // Set the user information in local storage
+    localStorage.setItem('user', userJSON);
+  
+    // Set isAuthenticated to true
+    setIsAuthenticated(true);
+  
+    // Notify the parent component about the login
+    onUserLogin();
   };
+  
 
   const handleSignup = (e) => {
     e.preventDefault();
@@ -131,6 +150,3 @@ const LoginSignUp = () => {
 };
 
 export default LoginSignUp;
-
-
-

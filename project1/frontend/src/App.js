@@ -1,34 +1,59 @@
-/* /frontend/App.js */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
+import { Container, Row, Col } from "react-bootstrap";
 import Header from "./Pages/Header";
-import LoginSignUp from "./Pages/LoginSignUp";
 import ProductMaster from "./Pages/ProductMaster";
-import Vender from "./Pages/Vender";
+import Vendor from "./Pages/Vender";
+import LoginSignUp from "./Pages/LoginSignUp";
+import Sidebar from "./Pages/Sidebar";
 
 function App() {
-  // State to check the login status
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
 
-  // Function to handle user login
+  useEffect(() => {
+    // Check for token in localStorage
+    const user = localStorage.getItem("user");
+    if (user) {
+      setIsUserLoggedIn(true);
+    }
+  }, []);
+
   const handleUserLogin = () => {
-    // Simulate successful login
     setIsUserLoggedIn(true);
   };
 
   return (
-    <div>
-      <Header />
-      {/* Conditionally render components based on user login status */}
-      {!isUserLoggedIn && (
-        <LoginSignUp onUserLogin={handleUserLogin} />
-      )}
+    <Router>
       {isUserLoggedIn && (
         <div>
-          <ProductMaster />
-          <Vender />
+          <Header />
+          <Row>
+            {/* Sidebar */}
+            <Col sm={3} className="sidebar-col">
+              <Sidebar />
+            </Col>
+
+            {/* Main Content */}
+            <Col sm={isUserLoggedIn ? 9 : 12} className="content-col">
+              {/* Routes */}
+              <Routes>
+                <Route path="/products" element={<ProductMaster />} />
+                <Route path="/vendor" element={<Vendor />} />
+              </Routes>
+            </Col>
+          </Row>
         </div>
       )}
-    </div>
+
+      {!isUserLoggedIn && (
+        <Row>
+          <Col sm={12}>
+            {/* Login page */}
+            <LoginSignUp onUserLogin={handleUserLogin} />
+          </Col>
+        </Row>
+      )}
+    </Router>
   );
 }
 

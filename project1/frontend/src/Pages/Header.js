@@ -5,7 +5,7 @@ import { Navbar } from 'react-bootstrap';
 
 const Header = () => {
     const customNavbarStyle = {
-        backgroundColor: '#3498db', // Change this color to your preference
+        backgroundColor: '#3498db', 
       };
     
       return (
