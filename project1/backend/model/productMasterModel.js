@@ -1,6 +1,6 @@
 /* /backend/model/productMasterModel.js */
 
-const createConnection = require('./database');
+const createConnection = require("./database");
 
 const ProductMasterModel = {
   initialize: async () => {
@@ -28,14 +28,53 @@ const ProductMasterModel = {
     }
   },
 
+  // Fetch all data
   getAllProducts: async () => {
     try {
       const connection = await createConnection();
-      const [rows] = await connection.query('SELECT * FROM ProductMaster');
+      const [rows] = await connection.query("SELECT * FROM ProductMaster");
       connection.end();
       return rows;
     } catch (err) {
-      console.error('Error fetching products.', err);
+      console.error("Error fetching products.", err);
+      throw err;
+    }
+  },
+
+  // Add new product
+  addProduct: async (product) => {
+    try {
+      const connection = await createConnection();
+
+      // Insert the new product into the ProductMaster table
+      const [result] = await connection.query(
+        `
+          INSERT INTO ProductMaster 
+          (productName, category, subCategory, units, rate, mrp, openingBalance) 
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `,
+        [
+          product.productName,
+          product.category,
+          product.subCategory,
+          product.units,
+          product.rate,
+          product.mrp,
+          product.openingBalance,
+        ]
+      );
+
+      // Get the inserted product details
+      const [newProduct] = await connection.query(
+        "SELECT * FROM ProductMaster WHERE id = ?",
+        [result.insertId]
+      );
+
+      connection.end();
+
+      return newProduct[0];
+    } catch (err) {
+      console.error("Error adding product.", err);
       throw err;
     }
   },
