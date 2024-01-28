@@ -78,7 +78,71 @@ const ProductMasterModel = {
       throw err;
     }
   },
+
+  // Delete product by ID
+  deleteProduct: async (productId) => {
+    try {
+      const connection = await createConnection();
+
+      // Delete the product from the ProductMaster table by ID
+      await connection.query('DELETE FROM ProductMaster WHERE id = ?', [productId]);
+
+      connection.end();
+      console.log(`Product with ID ${productId} deleted successfully.`);
+    } catch (err) {
+      console.error(`Error deleting product with ID ${productId}.`, err);
+      throw err;
+    }
+  },
 };
+
+// Update product by ID
+updateProduct: async (productData) => {
+  const {
+    id,
+    productName,
+    category,
+    subCategory,
+    units,
+    rate,
+    mrp,
+    openingBalance,
+  } = productData;
+
+  try {
+    // SQL query to update the product
+    const query =
+      'UPDATE ProductMaster SET productName=?, category=?, subCategory=?, units=?, rate=?, mrp=?, openingBalance=? WHERE id=?';
+
+    // Execute the query
+    const result = await pool.query(query, [
+      productName,
+      category,
+      subCategory,
+      units,
+      rate,
+      mrp,
+      openingBalance,
+      id,
+    ]);
+
+    // Check if the update was successful
+    if (result.affectedRows > 0) {
+      // Fetch the updated product
+      const updatedProduct = await pool.query(
+        'SELECT * FROM ProductMaster WHERE id=?',
+        [id]
+      );
+
+      // Return the updated product
+      return updatedProduct[0];
+    } else {
+      throw new Error('Product not found');
+    }
+  } catch (error) {
+    throw error;
+  }
+},
 
 // Initialize the table when the module is imported
 ProductMasterModel.initialize();

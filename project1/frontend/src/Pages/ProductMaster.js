@@ -73,6 +73,18 @@ export default function ProductMaster() {
     openingBalance: "",
   });
 
+  //for updating
+  const [editProductData, setEditProductData] = useState({
+    id: null,
+    productName: "",
+    category: "",
+    subCategory: "",
+    units: "",
+    rate: "",
+    mrp: "",
+    openingBalance: "",
+  });
+
   // Function to handle input change
   const handleInputChange = (e, fieldName) => {
     const { value } = e.target;
@@ -117,6 +129,75 @@ export default function ProductMaster() {
     }
   };
 
+  // Function to handle deleting a product
+  const handleDeleteProduct = async (productId) => {
+    try {
+      // Make a DELETE request to delete the product by ID
+      const response = await fetch(`http://localhost:3001/productMaster/${productId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        alert('Deletion successful.');
+        // Refresh the product list after deleting a product
+        fetchProducts();
+      } else {
+        console.error("Error deleting product:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
+  const handleEditFormOpen = (id, productName, category,  subCategory, units, rate, mrp, openingBalance) => {
+    setEditProductData({
+      id: id,
+      productName: productName,
+      category: category,
+      subCategory: subCategory,
+      units: units,
+      rate: rate,
+      mrp: mrp,
+      openingBalance: openingBalance,
+    });
+    setShowForm(true);
+    console.log('editProductData:', editProductData);
+  }; 
+
+// Function to handle editing a product
+const handleEditProduct = async () => {
+  try {
+    const response = await fetch(`http://localhost:3001/productMaster/${editProductData.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editProductData),
+    });
+
+    if (response.ok) {
+      fetchProducts();
+      setEditProductData({
+        id: null,
+        productName: "",
+        category: "",
+        subCategory: "",
+        units: "",
+        rate: "",
+        mrp: "",
+        openingBalance: "",
+      });
+      setShowForm(false);
+    } else {
+      console.error("Error editing product:", response.statusText);
+    }
+  } catch (error) {
+    console.error("Error editing product:", error);
+  }
+};
+
+
+
 
   return (
     <div>
@@ -141,12 +222,12 @@ export default function ProductMaster() {
         </Button>
         {showForm && (
           <Form
-            style={customFormStyle}
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleAddProduct(); // Call handleAddProduct on form submission
-            }}
-          >
+          style={customFormStyle}
+          onSubmit={(e) => {
+            e.preventDefault();
+            editProductData.id ? handleEditProduct() : handleAddProduct();
+          }}
+        >
             <Row style={inputRowStyle}>
               <Col>
                 <Form.Label>Product Name:</Form.Label>
@@ -279,6 +360,7 @@ export default function ProductMaster() {
               <th>Rate</th>
               <th>MRP</th>
               <th>Opening Balance</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -292,6 +374,7 @@ export default function ProductMaster() {
                 <td>{product.rate}</td>
                 <td>{product.mrp}</td>
                 <td>{product.openingBalance}</td>
+                <td><div style={{display: "flex", flexDirection: "row"}}><Button onClick={() => handleEditFormOpen(product.id, product.productName, product.category,  product.subCategory, product.units, product.rate, product.mrp, product.openingBalance)}>Edit</Button>  <Button onClick={() => handleDeleteProduct(product.id)}>Delete</Button></div></td>
               </tr>
             ))}
           </tbody>
