@@ -12,9 +12,9 @@ const ProductMasterModel = {
         CREATE TABLE IF NOT EXISTS ProductMaster (
           id INT AUTO_INCREMENT PRIMARY KEY,
           productName VARCHAR(255) NOT NULL,
-          category VARCHAR(255) NOT NULL,
-          subCategory VARCHAR(255) NOT NULL,
-          units VARCHAR(255) NOT NULL,
+          category INT NOT NULL,
+          subCategory INT NOT NULL,
+          units INT NOT NULL,
           rate FLOAT NOT NULL,
           mrp FLOAT NOT NULL,
           openingBalance FLOAT NOT NULL
@@ -41,43 +41,44 @@ const ProductMasterModel = {
     }
   },
 
-  // Add new product
-  addProduct: async (product) => {
-    try {
-      const connection = await createConnection();
+// Add new product
+addProduct: async (product) => {
+  try {
+    const connection = await createConnection();
 
-      // Insert the new product into the ProductMaster table
-      const [result] = await connection.query(
-        `
-          INSERT INTO ProductMaster 
-          (productName, category, subCategory, units, rate, mrp, openingBalance) 
-          VALUES (?, ?, ?, ?, ?, ?, ?)
-        `,
-        [
-          product.productName,
-          product.category,
-          product.subCategory,
-          product.units,
-          product.rate,
-          product.mrp,
-          product.openingBalance,
-        ]
-      );
+    // Insert the new product into the ProductMaster table
+    const [result] = await connection.query(
+      `
+      INSERT INTO ProductMaster 
+      (productName, category, subCategory, units, rate, mrp, openingBalance) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        product.productName,
+        product.category,
+        product.subCategory,
+        product.units,
+        product.rate,
+        product.mrp,
+        product.openingBalance,
+      ]
+    );
 
-      // Get the inserted product details
-      const [newProduct] = await connection.query(
-        "SELECT * FROM ProductMaster WHERE id = ?",
-        [result.insertId]
-      );
+    // Get the inserted product details
+    const [newProduct] = await connection.query(
+      "SELECT * FROM ProductMaster WHERE id = ?",
+      [result.insertId]
+    );
 
-      connection.end();
+    connection.end();
 
-      return newProduct[0];
-    } catch (err) {
-      console.error("Error adding product.", err);
-      throw err;
-    }
-  },
+    return newProduct[0];
+  } catch (err) {
+    console.error("Error adding product.", err);
+    throw err;
+  }
+},
+
 
   // Delete product by ID
   deleteProduct: async (productId) => {
