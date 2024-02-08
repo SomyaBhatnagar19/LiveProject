@@ -96,8 +96,8 @@ const ProductMasterModel = {
   },
 };
 
-// Update product by ID
-updateProduct: async (productData) => {
+ // Update product by ID
+ editProduct: async (productData) => {
   const {
     id,
     productName,
@@ -110,12 +110,14 @@ updateProduct: async (productData) => {
   } = productData;
 
   try {
+    const connection = await createConnection();
+
     // SQL query to update the product
     const query =
       'UPDATE ProductMaster SET productName=?, category=?, subCategory=?, units=?, rate=?, mrp=?, openingBalance=? WHERE id=?';
 
     // Execute the query
-    const result = await pool.query(query, [
+    const [result] = await connection.query(query, [
       productName,
       category,
       subCategory,
@@ -126,10 +128,12 @@ updateProduct: async (productData) => {
       id,
     ]);
 
+    connection.end();
+
     // Check if the update was successful
     if (result.affectedRows > 0) {
       // Fetch the updated product
-      const updatedProduct = await pool.query(
+      const [updatedProduct] = await connection.query(
         'SELECT * FROM ProductMaster WHERE id=?',
         [id]
       );
@@ -142,7 +146,8 @@ updateProduct: async (productData) => {
   } catch (error) {
     throw error;
   }
-},
+}
+
 
 // Initialize the table when the module is imported
 ProductMasterModel.initialize();

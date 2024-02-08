@@ -61,7 +61,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Update a product by ID
+ // Update a product by ID
 router.put('/:id', async (req, res) => {
   try {
     const productId = req.params.id;
@@ -73,7 +73,7 @@ router.put('/:id', async (req, res) => {
     }
 
     // Call the model function to update the product in the database
-    const updatedProduct = await ProductMasterModel.updateProduct({
+    const updatedProduct = await ProductMasterModel.editProduct({
       id: productId,
       productName,
       category,
@@ -84,11 +84,16 @@ router.put('/:id', async (req, res) => {
       openingBalance,
     });
 
+    if (!updatedProduct) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
     res.status(200).json(updatedProduct);
   } catch (error) {
     console.error('Error updating product:', error);
-    res.status(500).json({ error: 'Internal Server Error', error });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 module.exports = router;
