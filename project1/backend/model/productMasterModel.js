@@ -1,6 +1,9 @@
 /* /backend/model/productMasterModel.js */
 
 const createConnection = require("./database");
+const SubcategoryModel = require('./subcategoryModel');
+const CategoryModel = require('./categoryModel');
+const UnitModel = require('./unitsModel');
 
 const ProductMasterModel = {
   initialize: async () => {
@@ -28,18 +31,50 @@ const ProductMasterModel = {
     }
   },
 
-  // Fetch all data
-  getAllProducts: async () => {
-    try {
-      const connection = await createConnection();
-      const [rows] = await connection.query("SELECT * FROM ProductMaster");
-      connection.end();
-      return rows;
-    } catch (err) {
-      console.error("Error fetching products.", err);
-      throw err;
-    }
-  },
+ // Fetch all data
+getAllProducts: async () => {
+  try {
+    const connection = await createConnection();
+
+    // Fetch products with category, subcategory, and unit names
+    const [rows] = await connection.query(`
+      SELECT 
+        a.id, 
+        a.productName, 
+        b.name AS category, 
+        c.name AS subCategory, 
+        d.name AS unit, 
+        a.rate, 
+        a.mrp, 
+        a.openingBalance 
+      FROM 
+        inventory.productmaster a
+      INNER JOIN 
+        inventory.category b ON a.category = b.id
+      INNER JOIN 
+        inventory.subCategory c ON a.subCategory = c.id
+      INNER JOIN 
+        inventory.unit d ON a.units = d.id
+    `);
+
+    connection.end();
+
+    // Return fetched products with additional details
+    return rows.map((product) => ({
+      id: product.id,
+      productName: product.productName,
+      category: product.category,
+      subCategory: product.subCategory,
+      unit: product.unit,
+      rate: product.rate,
+      mrp: product.mrp,
+      openingBalance: product.openingBalance,
+    }));
+  } catch (err) {
+    console.error("Error fetching products.", err);
+    throw err;
+  }
+},
 
 // Add new product
 addProduct: async (product) => {

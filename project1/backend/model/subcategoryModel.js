@@ -31,6 +31,17 @@ const SubcategoryModel = {
       throw error;
     }
   },
+  getSubcategoryNameById: async (subcategoryId) => {
+    try {
+      const connection = await createConnection();
+      const [rows] = await connection.query("SELECT name FROM Subcategory WHERE id = ?", [subcategoryId]);
+      connection.end();
+      return rows[0].name;
+    } catch (error) {
+      console.error("Error fetching subcategory name by ID:", error);
+      throw error;
+    }
+  },
 
   createSubcategory: async (subcategoryData) => {
     try {

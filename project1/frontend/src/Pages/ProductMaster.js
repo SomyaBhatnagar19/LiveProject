@@ -74,8 +74,11 @@ export default function ProductMaster() {
   const fetchProducts = async () => {
     try {
       const response = await fetch("http://localhost:3001/productMaster");
+      if (!response.ok) {
+        throw new Error("Failed to fetch products");
+      }
       const data = await response.json();
-      setProducts(data);
+      setProducts(data); 
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -364,7 +367,7 @@ export default function ProductMaster() {
               </Col>
               <Col>
                 <FormControl
-                  type="number"
+                  type="numeric"
                   required
                   value={newProductData.rate}
                   onChange={(e) => {
@@ -384,7 +387,7 @@ export default function ProductMaster() {
               </Col>
               <Col>
                 <FormControl
-                  type="number"
+                  type="numeric"
                   required
                   value={newProductData.mrp}
                   onChange={(e) => {
@@ -440,17 +443,16 @@ export default function ProductMaster() {
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
-              <tr key={product.id}>
-                {/* <td>{product.id}</td> */}
-                <td>{product.productName}</td>
-                <td>{product.category}</td>
-                <td>{product.subCategory}</td>
-                <td>{product.units}</td>
-                <td>{product.rate}</td>
-                <td>{product.mrp}</td>
-                <td>{product.openingBalance}</td>
-                <td>
+          {products.map((product) => (
+    <tr key={product.id}>
+      <td>{product.productName}</td>
+      <td>{product.category}</td>
+      <td>{product.subCategory}</td>
+      <td>{product.unit}</td>
+      <td>{product.rate}</td>
+      <td>{product.mrp}</td>
+      <td>{product.openingBalance}</td>
+      <td>
                   <div style={{ display: "flex", flexDirection: "row" }}>
                     <Button
                       onClick={() =>

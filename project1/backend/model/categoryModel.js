@@ -31,6 +31,18 @@ const CategoryModel = {
       throw error;
     }
   },
+  
+  getCategoryNameById: async (categoryId) => {
+    try {
+    const connection = await createConnection();
+    const [rows] = await connection.query("SELECT name FROM Category WHERE id = ?", [categoryId]);
+    connection.end();
+    return rows[0].name;
+    } catch (error) {
+    console.error("Error fetching category name by ID:", error);
+    throw error;
+    }
+},
 
   createCategory: async (categoryData) => {
     try {
@@ -44,6 +56,8 @@ const CategoryModel = {
     }
   }
 };
+
+    
 
 // Initialize the Category table
 CategoryModel.initialize();

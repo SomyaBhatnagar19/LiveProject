@@ -31,6 +31,17 @@ const UnitModel = {
       throw error;
     }
   },
+  getUnitNameById: async (unitId) => {
+    try {
+      const connection = await createConnection();
+      const [rows] = await connection.query("SELECT name FROM Unit WHERE id = ?", [unitId]);
+      connection.end();
+      return rows[0].name;
+    } catch (error) {
+      console.error("Error fetching unit name by ID:", error);
+      throw error;
+    }
+  },
 
   createUnit: async (unitData) => {
     try {
