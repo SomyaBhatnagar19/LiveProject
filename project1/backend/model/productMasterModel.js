@@ -4,6 +4,7 @@ const createConnection = require("./database");
 const SubcategoryModel = require('./subcategoryModel');
 const CategoryModel = require('./categoryModel');
 const UnitModel = require('./unitsModel');
+const { connect } = require("../controller/productMasterController");
 
 const ProductMasterModel = {
   initialize: async () => {
@@ -38,23 +39,7 @@ getAllProducts: async () => {
 
     // Fetch products with category, subcategory, and unit names
     const [rows] = await connection.query(`
-      SELECT 
-        a.id, 
-        a.productName, 
-        b.name AS category, 
-        c.name AS subCategory, 
-        d.name AS unit, 
-        a.rate, 
-        a.mrp, 
-        a.openingBalance 
-      FROM 
-        inventory.productmaster a
-      INNER JOIN 
-        inventory.category b ON a.category = b.id
-      INNER JOIN 
-        inventory.subCategory c ON a.subCategory = c.id
-      INNER JOIN 
-        inventory.unit d ON a.units = d.id
+    SELECT a.id, a.productName, a.category as categoryId, b.name as category, a.subCategory as subCategoryId, c.name as subCategory, a.units as unitsId,d.name as unit, a.rate, a.mrp, a.openingBalance FROM inventory.productmaster a, inventory.category b, inventory.subCategory c, inventory.unit d WHERE a.category=b.id and a.subCategory=c.id and a.units=d.id; 
     `);
 
     connection.end();
@@ -130,60 +115,43 @@ addProduct: async (product) => {
       throw err;
     }
   },
-};
 
- // Update product by ID
- editProduct: async (productData) => {
-  const {
-    id,
-    productName,
-    category,
-    subCategory,
-    units,
-    rate,
-    mrp,
-    openingBalance,
-  } = productData;
-
-  try {
-    const connection = await createConnection();
-
-    // SQL query to update the product
-    const query =
-      'UPDATE ProductMaster SET productName=?, category=?, subCategory=?, units=?, rate=?, mrp=?, openingBalance=? WHERE id=?';
-
-    // Execute the query
-    const [result] = await connection.query(query, [
-      productName,
-      category,
-      subCategory,
-      units,
-      rate,
-      mrp,
-      openingBalance,
-      id,
-    ]);
-
-    connection.end();
-
-    // Check if the update was successful
-    if (result.affectedRows > 0) {
-      // Fetch the updated product
-      const [updatedProduct] = await connection.query(
-        'SELECT * FROM ProductMaster WHERE id=?',
-        [id]
-      );
-
-      // Return the updated product
-      return updatedProduct[0];
-    } else {
-      throw new Error('Product not found');
+  // Add the following function to update a product by ID
+  updateProduct: async (id, updatedProduct) => {
+    try {
+      const connection = await createConnection();
+  
+      // Update the product in the ProductMaster table
+      const query =
+        "UPDATE ProductMaster SET productName=?, category=?, subCategory=?, units=?, rate=?, mrp=?, openingBalance=? WHERE id=?";
+      const [result] = await connection.query(query, [
+        updatedProduct.productName,
+        updatedProduct.category,
+        updatedProduct.subCategory,
+        updatedProduct.units,
+        updatedProduct.rate,
+        updatedProduct.mrp,
+        updatedProduct.openingBalance,
+        id,
+      ]);
+  
+      // Close the connection
+      connection.end();
+      console.log(`Product with ID ${id} updated successfully.`);
+      // Check if the update was successful
+      if (result.affectedRows > 0) {
+        // Return the updated product ID
+        return id;
+      } else {
+        throw new Error("Product not found");
+      }
+    } catch (error) {
+      console.error("Error updating product.", error);
+      throw error;
     }
-  } catch (error) {
-    throw error;
-  }
+  },
+  
 }
-
 
 // Initialize the table when the module is imported
 ProductMasterModel.initialize();

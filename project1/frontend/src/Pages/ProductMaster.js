@@ -78,7 +78,7 @@ export default function ProductMaster() {
         throw new Error("Failed to fetch products");
       }
       const data = await response.json();
-      setProducts(data); 
+      setProducts(data);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -149,19 +149,27 @@ export default function ProductMaster() {
           mrp: "",
           openingBalance: "",
         });
-        alert('Product added successfully!');
+        alert("Product added successfully!");
       } else {
         console.error("Error adding product:", response.statusText);
-        alert('Error adding product.' , response.statusText);
+        alert("Error adding product.", response.statusText);
       }
     } catch (error) {
       console.error("Error adding product:", error);
-      alert('Error adding product.');
+      alert("Error adding product.");
     }
   };
 
   const handleInputChange = (e, fieldName) => {
-    const { value } = e.target;
+    let value = e.target.value;
+    if (
+      fieldName === "rate" ||
+      fieldName === "mrp" ||
+      fieldName === "openingBalance"
+    ) {
+      // Parse numeric fields as numbers
+      value = parseFloat(value);
+    }
     setNewProductData({
       ...newProductData,
       [fieldName]: value,
@@ -173,7 +181,7 @@ export default function ProductMaster() {
     productName,
     category,
     subCategory,
-    units,
+    unit, // Corrected to use 'unit' instead of 'units'
     rate,
     mrp,
     openingBalance
@@ -183,17 +191,17 @@ export default function ProductMaster() {
       productName: productName,
       category: category,
       subCategory: subCategory,
-      units: units,
+      units: unit, // Corrected to use 'unit' instead of 'units'
       rate: rate,
       mrp: mrp,
       openingBalance: openingBalance,
     });
     setNewProductData({
-      ...newProductData,
+      id: id,
       productName: productName,
       category: category,
       subCategory: subCategory,
-      units: units,
+      units: unit, 
       rate: rate,
       mrp: mrp,
       openingBalance: openingBalance,
@@ -201,33 +209,53 @@ export default function ProductMaster() {
     setShowForm(true);
   };
 
-  // Function to handle editing a product
-  const handleEditProduct = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:3001/productMaster/${editProductData.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editProductData),
-        }
-      );
-
-      if (response.ok) {
-        // Refresh the product list after editing a product
-        fetchProducts();
-        setShowForm(false);
-      } else if (response.status === 404) {
-        console.error("Product not found");
-      } else {
-        console.error("Error editing product:", response.statusText);
+  // Inside handleEditProduct function
+// Function to handle editing a product
+const handleEditProduct = async () => {
+  try {
+    const response = await fetch(
+      `http://localhost:3001/productMaster/${newProductData.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productName: newProductData.productName,
+          category: newProductData.category,
+          subCategory: newProductData.subCategory,
+          units: newProductData.units,
+          rate: newProductData.rate,
+          mrp: newProductData.mrp,
+          openingBalance: newProductData.openingBalance,
+        }),
       }
-    } catch (error) {
-      console.error("Error editing product:", error);
+    );
+
+    if (response.ok) {
+      fetchProducts();
+      setShowForm(false);
+      setNewProductData({
+        productName: "",
+        category: "",
+        subCategory: "",
+        units: "",
+        rate: "",
+        mrp: "",
+        openingBalance: "",
+      });
+      alert("Product updated successfully!");
+    } else {
+      console.error("Error updating product:", response.statusText);
+      alert("Error updating product.", response.statusText);
     }
-  };
+  } catch (error) {
+    console.error("Error updating product:", error);
+    alert("Error updating product.");
+  }
+};
+
+
 
   // Function to handle deleting a product
   const handleDeleteProduct = async (productId) => {
@@ -281,7 +309,11 @@ export default function ProductMaster() {
             }}
             onSubmit={(e) => {
               e.preventDefault();
-              handleAddProduct();
+              if (editProductData.id) {
+                handleEditProduct();
+              } else {
+                handleAddProduct();
+              }
             }}
           >
             <Row style={{ marginBottom: "10px" }}>
@@ -443,25 +475,25 @@ export default function ProductMaster() {
             </tr>
           </thead>
           <tbody>
-          {products.map((product) => (
-    <tr key={product.id}>
-      <td>{product.productName}</td>
-      <td>{product.category}</td>
-      <td>{product.subCategory}</td>
-      <td>{product.unit}</td>
-      <td>{product.rate}</td>
-      <td>{product.mrp}</td>
-      <td>{product.openingBalance}</td>
-      <td>
+            {products.map((product) => (
+              <tr key={product.id}>
+                <td>{product.productName}</td>
+                <td>{product.category}</td>
+                <td>{product.subCategory}</td>
+                <td>{product.unit}</td>
+                <td>{product.rate}</td>
+                <td>{product.mrp}</td>
+                <td>{product.openingBalance}</td>
+                <td>
                   <div style={{ display: "flex", flexDirection: "row" }}>
                     <Button
                       onClick={() =>
                         handleEditFormOpen(
                           product.id,
                           product.productName,
-                          product.category,
-                          product.subCategory,
-                          product.units,
+                          product.categoryId,
+                          product.subCategoryId,
+                          product.unitsId, // Adjusted to use product.unit instead of product.units
                           product.rate,
                           product.mrp,
                           product.openingBalance

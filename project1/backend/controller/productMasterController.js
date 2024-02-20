@@ -61,20 +61,35 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
- // Update a product by ID
-router.put('/:id', async (req, res) => {
+// Add the following route to handle the product update
+router.put("/:id", async (req, res) => {
   try {
     const productId = req.params.id;
-    const { productName, category, subCategory, units, rate, mrp, openingBalance } = req.body;
+    const {
+      productName,
+      category,
+      subCategory,
+      units,
+      rate,
+      mrp,
+      openingBalance,
+    } = req.body;
 
     // Validate input (add more validation as needed)
-    if (!productName || !category || !subCategory || !units || !rate || !mrp || !openingBalance) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (
+      !productName ||
+      !category ||
+      !subCategory ||
+      !units ||
+      !rate ||
+      !mrp ||
+      !openingBalance
+    ) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // Call the model function to update the product in the database
-    const updatedProduct = await ProductMasterModel.editProduct({
-      id: productId,
+    // Call the model function to update the product
+    const updatedProduct = await ProductMasterModel.updateProduct(productId, {
       productName,
       category,
       subCategory,
@@ -84,16 +99,14 @@ router.put('/:id', async (req, res) => {
       openingBalance,
     });
 
-    if (!updatedProduct) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-
     res.status(200).json(updatedProduct);
   } catch (error) {
-    console.error('Error updating product:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error updating product:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
 
 
 module.exports = router;
